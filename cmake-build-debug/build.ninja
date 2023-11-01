@@ -55,6 +55,12 @@ build CMakeFiles/SysProgLab5.dir/input1.c.o: C_COMPILER__SysProgLab5_Debug /User
   OBJECT_DIR = CMakeFiles/SysProgLab5.dir
   OBJECT_FILE_DIR = CMakeFiles/SysProgLab5.dir
 
+build CMakeFiles/SysProgLab5.dir/input2.c.o: C_COMPILER__SysProgLab5_Debug /Users/maksymkhodakov/CLionProjects/SysProgLab5/input2.c || cmake_object_order_depends_target_SysProgLab5
+  DEP_FILE = CMakeFiles/SysProgLab5.dir/input2.c.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk
+  OBJECT_DIR = CMakeFiles/SysProgLab5.dir
+  OBJECT_FILE_DIR = CMakeFiles/SysProgLab5.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target SysProgLab5
@@ -63,7 +69,7 @@ build CMakeFiles/SysProgLab5.dir/input1.c.o: C_COMPILER__SysProgLab5_Debug /User
 #############################################
 # Link the executable SysProgLab5
 
-build SysProgLab5: C_EXECUTABLE_LINKER__SysProgLab5_Debug CMakeFiles/SysProgLab5.dir/input1.c.o
+build SysProgLab5: C_EXECUTABLE_LINKER__SysProgLab5_Debug CMakeFiles/SysProgLab5.dir/input1.c.o CMakeFiles/SysProgLab5.dir/input2.c.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk
   OBJECT_DIR = CMakeFiles/SysProgLab5.dir
   POST_BUILD = :

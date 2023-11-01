@@ -4,15 +4,18 @@
     #include<stdlib.h>
     #include<ctype.h>
     #include"lex.yy.c"
+
     void yyerror(const char *s);
     int yylex();
     int yywrap();
     void add(char);
     void insert_type();
+
     int search(char *);
 	void insert_type();
 	void print_tree(struct node*);
 	void print_inorder(struct node *);
+
     void check_declaration(char *);
 	void check_return_type(char *);
 	int check_types(char *, char *);
@@ -28,28 +31,29 @@
 
     int count=0;
     int q;
-	char type[10];
-    extern int countn;
-	struct node *head;
-	int sem_errors=0;
-	int ic_idx=0;
-	int temp_var=0;
-	int label=0;
-	int is_for=0;
-	char buff[100];
-	char errors[10][100];
-	char reserved[10][10] = {"int", "float", "char", "void", "if", "else", "for", "main", "return", "include"};
-	char icg[50][100];
+    char type[10];
 
-	struct node {
-		struct node *left;
-		struct node *right;
+    extern int countn;
+    struct node *head;
+    int sem_errors=0;
+    int ic_idx=0;
+    int temp_var=0;
+    int label=0;
+    int is_for=0;
+    char buff[100];
+    char errors[10][100];
+    char reserved[10][10] = {"int", "float", "char", "void", "if", "else", "for", "main", "return", "include"};
+    char icg[50][100];
+
+    struct node {
+    	struct node *left;
+    		struct node *right;
 		char *token;
 	};
 
 %}
 
-%union { struct var_name {
+%union { 	struct var_name {
 			char name[100];
 			struct node* nd;
 		} nd_obj;
@@ -66,7 +70,8 @@
 			char if_body[5];
 			char else_body[5];
 		} nd_obj3;
-	}
+}
+
 %token VOID
 %token <nd_obj> CHARACTER PRINTFF SCANFF INT FLOAT CHAR FOR IF ELSE TRUE FALSE NUMBER FLOAT_NUM ID LE GE EQ NE GT LT AND OR STR ADD MULTIPLY DIVIDE SUBTRACT UNARY INCLUDE RETURN
 %type <nd_obj> headers main body return datatype statement arithmetic relop program else
@@ -75,7 +80,9 @@
 
 %%
 
-program: headers main '(' ')' '{' body return '}' { $2.nd = mknode($6.nd, $7.nd, "main"); $$.nd = mknode($1.nd, $2.nd, "program");
+program: headers main '(' ')' '{' body return '}' {
+ 	$2.nd = mknode($6.nd, $7.nd, "main");
+ 	$$.nd = mknode($1.nd, $2.nd, "program");
 	head = $$.nd;
 }
 ;
@@ -331,15 +338,15 @@ int main() {
 	printf("\n\n\n\n");
 	printf("\t\t\t\t\t\t\t\t SEMANTIC ANALYSIS \n\n");
 	if(sem_errors>0) {
-		printf("Semantic analysis completed with %d errors\n", sem_errors);
+		printf("Found %d errors\n", sem_errors);
 		for(int i=0; i<sem_errors; i++){
-			printf("\t - %s", errors[i]);
+			printf("\t --- %s", errors[i]);
 		}
 	} else {
-		printf("Semantic analysis completed with no errors");
+		printf("Analysis completed without errors");
 	}
 	printf("\n\n");
-	printf("\t\t\t\t\t\t\t INTERMEDIATE CODE GENERATION \n\n");
+	printf("\t\t\t\t\t\t\t\t INTERMEDIATE CODE \n\n");
 	for(int i=0; i<ic_idx; i++){
 		printf("%s", icg[i]);
 	}
@@ -381,27 +388,34 @@ int check_types(char *type1, char *type2){
 	// declaration with no init
 	if(!strcmp(type2, "null"))
 		return -1;
+
 	// both datatypes are same
 	if(!strcmp(type1, type2))
 		return 0;
+
 	// both datatypes are different
 	if(!strcmp(type1, "int") && !strcmp(type2, "float"))
 		return 1;
+
 	if(!strcmp(type1, "float") && !strcmp(type2, "int"))
 		return 2;
+
 	if(!strcmp(type1, "int") && !strcmp(type2, "char"))
 		return 3;
+
 	if(!strcmp(type1, "char") && !strcmp(type2, "int"))
 		return 4;
+
 	if(!strcmp(type1, "float") && !strcmp(type2, "char"))
 		return 5;
+
 	if(!strcmp(type1, "char") && !strcmp(type2, "float"))
 		return 6;
 }
 
 char *get_type(char *var){
 	for(int i=0; i<count; i++) {
-		// Handle case of use before declaration
+		// Handle usage before declaration
 		if(!strcmp(symbol_table[i].id_name, var)) {
 			return symbol_table[i].data_type;
 		}

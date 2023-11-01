@@ -110,8 +110,8 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 52 "parser.y"
-{ struct var_name {
+#line 56 "parser.y"
+{ 	struct var_name {
 			char name[100];
 			struct node* nd;
 		} nd_obj;
@@ -128,7 +128,7 @@ typedef union YYSTYPE
 			char if_body[5];
 			char else_body[5];
 		} nd_obj3;
-	}
+}
 /* Line 1529 of yacc.c.  */
 #line 134 "y.tab.h"
 	YYSTYPE;
