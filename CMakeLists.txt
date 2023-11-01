@@ -3,4 +3,4 @@ project(SysProgLab5)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(SysProgLab5 input.c input.c)
+add_executable(SysProgLab5 test1.c test1.c test2.c)
