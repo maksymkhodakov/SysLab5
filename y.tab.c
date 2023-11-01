@@ -166,7 +166,7 @@
         char * data_type;
         char * type;
         int line_no;
-	} symbol_table[40];
+	} symbol_table[100];
 
     int count=0;
     int q;
