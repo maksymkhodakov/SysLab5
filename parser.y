@@ -8,26 +8,25 @@
     void yyerror(const char *s);
     int yylex();
     int yywrap();
+
     void add(char);
-    void insert_type();
-
+    void insertType();
     int search(char *);
-    void insert_type();
-    void print_tree(struct node*);
-    void print_inorder(struct node *);
+    void printTree(struct node*);
+    void printInorder(struct node *);
 
-    void check_declaration(char *);
-    void check_return_type(char *);
-    int check_types(char *, char *);
-    char *get_type(char *);
-    struct node* mknode(struct node *left, struct node *right, char *token);
+    void checkDeclaration(char *);
+    void checkReturnType(char *);
+    int checkTypes(char *, char *);
+    char *getType(char *);
+    struct node* createNode(struct node *left, struct node *right, char *token);
 
     struct dataType {
         char * id_name;
         char * data_type;
         char * type;
         int line_no;
-	} symbol_table[100];
+    } symbolTable[100];
 
     int count=0;
     int q;
@@ -35,14 +34,16 @@
 
     extern int countn;
     struct node *head;
-    int sem_errors=0;
+
+    int semanticErrorsCounter=0;
     int ic_idx=0;
     int temp_var=0;
     int label=0;
     int is_for=0;
+
     char buff[100];
     char errors[10][100];
-    char reserved[10][10] = {"int", "float", "char", "void", "if", "else", "for", "main", "return", "include"};
+    char reservedKeywords[10][10] = {"int", "float", "char", "void", "if", "else", "for", "main", "return", "include"};
     char icg[50][100];
 
     struct node {
@@ -81,50 +82,27 @@
 %%
 
 program: headers main '(' ')' '{' body return '}' {
- 	$2.nd = mknode($6.nd, $7.nd, "main");
- 	$$.nd = mknode($1.nd, $2.nd, "program");
+ 	$2.nd = createNode($6.nd, $7.nd, "main");
+ 	$$.nd = createNode($1.nd, $2.nd, "program");
 	head = $$.nd;
 }
-;
-
-headers: headers headers { $$.nd = mknode($1.nd, $2.nd, "headers"); }
-| INCLUDE { add('H'); } { $$.nd = mknode(NULL, NULL, $1.name); }
 ;
 
 main: datatype ID { add('F'); }
 ;
 
-datatype: INT { insert_type(); }
-| FLOAT { insert_type(); }
-| CHAR { insert_type(); }
-| VOID { insert_type(); }
+datatype: INT { insertType(); }
+| FLOAT { insertType(); }
+| CHAR { insertType(); }
+| VOID { insertType(); }
 ;
 
-body: FOR { add('K'); is_for = 1; } '(' statement ';' condition ';' statement ')' '{' body '}' {
-	struct node *temp = mknode($6.nd, $8.nd, "CONDITION");
-	struct node *temp2 = mknode($4.nd, temp, "CONDITION");
-	$$.nd = mknode(temp2, $11.nd, $1.name);
-	sprintf(icg[ic_idx++], buff);
-	sprintf(icg[ic_idx++], "JUMP to %s\n", $6.if_body);
-	sprintf(icg[ic_idx++], "\nLABEL %s:\n", $6.else_body);
-}
-| IF { add('K'); is_for = 0; } '(' condition ')' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.if_body); } '{' body '}' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.else_body); } else {
-	struct node *iff = mknode($4.nd, $8.nd, $1.name);
-	$$.nd = mknode(iff, $11.nd, "if-else");
-	sprintf(icg[ic_idx++], "GOTO next\n");
-}
-| statement ';' { $$.nd = $1.nd; }
-| body body { $$.nd = mknode($1.nd, $2.nd, "statements"); }
-| PRINTFF { add('K'); } '(' STR ')' ';' { $$.nd = mknode(NULL, NULL, "printf"); }
-| SCANFF { add('K'); } '(' STR ',' '&' ID ')' ';' { $$.nd = mknode(NULL, NULL, "scanf"); }
-;
-
-else: ELSE { add('K'); } '{' body '}' { $$.nd = mknode(NULL, $4.nd, $1.name); }
-| { $$.nd = NULL; }
+headers: headers headers { $$.nd = createNode($1.nd, $2.nd, "headers"); }
+| INCLUDE { add('H'); } { $$.nd = createNode(NULL, NULL, $1.name); }
 ;
 
 condition: value relop value {
-	$$.nd = mknode($1.nd, $3.nd, $2.name);
+	$$.nd = createNode($1.nd, $3.nd, $2.name);
 	if(is_for) {
 		sprintf($$.if_body, "L%d", label++);
 		sprintf(icg[ic_idx++], "\nLABEL %s:\n", $$.if_body);
@@ -141,87 +119,110 @@ condition: value relop value {
 | { $$.nd = NULL; }
 ;
 
+body: FOR { add('K'); is_for = 1; } '(' statement ';' condition ';' statement ')' '{' body '}' {
+	struct node *temp = createNode($6.nd, $8.nd, "CONDITION");
+	struct node *temp2 = createNode($4.nd, temp, "CONDITION");
+	$$.nd = createNode(temp2, $11.nd, $1.name);
+	sprintf(icg[ic_idx++], buff);
+	sprintf(icg[ic_idx++], "JUMP to %s\n", $6.if_body);
+	sprintf(icg[ic_idx++], "\nLABEL %s:\n", $6.else_body);
+}
+| IF { add('K'); is_for = 0; } '(' condition ')' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.if_body); } '{' body '}' { sprintf(icg[ic_idx++], "\nLABEL %s:\n", $4.else_body); } else {
+	struct node *iff = createNode($4.nd, $8.nd, $1.name);
+	$$.nd = createNode(iff, $11.nd, "if-else");
+	sprintf(icg[ic_idx++], "GOTO next\n");
+}
+| statement ';' { $$.nd = $1.nd; }
+| body body { $$.nd = createNode($1.nd, $2.nd, "statements"); }
+| SCANFF { add('K'); } '(' STR ',' '&' ID ')' ';' { $$.nd = createNode(NULL, NULL, "scanf"); }
+| PRINTFF { add('K'); } '(' STR ')' ';' { $$.nd = createNode(NULL, NULL, "printf"); }
+;
+
+else: ELSE { add('K'); } '{' body '}' { $$.nd = createNode(NULL, $4.nd, $1.name); }
+| { $$.nd = NULL; }
+;
+
 statement: datatype ID { add('V'); } init {
-	$2.nd = mknode(NULL, NULL, $2.name);
-	int t = check_types($1.name, $4.type);
+	$2.nd = createNode(NULL, NULL, $2.name);
+	int t = checkTypes($1.name, $4.type);
 	if(t>0) {
 		if(t == 1) {
-			struct node *temp = mknode(NULL, $4.nd, "floattoint");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "floattoint");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 		else if(t == 2) {
-			struct node *temp = mknode(NULL, $4.nd, "inttofloat");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "inttofloat");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 		else if(t == 3) {
-			struct node *temp = mknode(NULL, $4.nd, "chartoint");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "chartoint");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 		else if(t == 4) {
-			struct node *temp = mknode(NULL, $4.nd, "inttochar");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "inttochar");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 		else if(t == 5) {
-			struct node *temp = mknode(NULL, $4.nd, "chartofloat");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "chartofloat");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 		else{
-			struct node *temp = mknode(NULL, $4.nd, "floattochar");
-			$$.nd = mknode($2.nd, temp, "declaration");
+			struct node *temp = createNode(NULL, $4.nd, "floattochar");
+			$$.nd = createNode($2.nd, temp, "declaration");
 		}
 	}
 	else {
-		$$.nd = mknode($2.nd, $4.nd, "declaration");
+		$$.nd = createNode($2.nd, $4.nd, "declaration");
 	}
 	sprintf(icg[ic_idx++], "%s = %s\n", $2.name, $4.name);
 }
-| ID { check_declaration($1.name); } '=' expression {
-	$1.nd = mknode(NULL, NULL, $1.name);
-	char *id_type = get_type($1.name);
+| ID { checkDeclaration($1.name); } '=' expression {
+	$1.nd = createNode(NULL, NULL, $1.name);
+	char *id_type = getType($1.name);
 	if(strcmp(id_type, $4.type)) {
 		if(!strcmp(id_type, "int")) {
 			if(!strcmp($4.type, "float")){
-				struct node *temp = mknode(NULL, $4.nd, "floattoint");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "floattoint");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 			else{
-				struct node *temp = mknode(NULL, $4.nd, "chartoint");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "chartoint");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 
 		}
 		else if(!strcmp(id_type, "float")) {
 			if(!strcmp($4.type, "int")){
-				struct node *temp = mknode(NULL, $4.nd, "inttofloat");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "inttofloat");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 			else{
-				struct node *temp = mknode(NULL, $4.nd, "chartofloat");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "chartofloat");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 
 		}
 		else{
 			if(!strcmp($4.type, "int")){
-				struct node *temp = mknode(NULL, $4.nd, "inttochar");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "inttochar");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 			else{
-				struct node *temp = mknode(NULL, $4.nd, "floattochar");
-				$$.nd = mknode($1.nd, temp, "=");
+				struct node *temp = createNode(NULL, $4.nd, "floattochar");
+				$$.nd = createNode($1.nd, temp, "=");
 			}
 		}
 	}
 	else {
-		$$.nd = mknode($1.nd, $4.nd, "=");
+		$$.nd = createNode($1.nd, $4.nd, "=");
 	}
 	sprintf(icg[ic_idx++], "%s = %s\n", $1.name, $4.name);
 }
-| ID { check_declaration($1.name); } relop expression { $1.nd = mknode(NULL, NULL, $1.name); $$.nd = mknode($1.nd, $4.nd, $3.name); }
-| ID { check_declaration($1.name); } UNARY {
-	$1.nd = mknode(NULL, NULL, $1.name);
-	$3.nd = mknode(NULL, NULL, $3.name);
-	$$.nd = mknode($1.nd, $3.nd, "ITERATOR");
+| ID { checkDeclaration($1.name); } relop expression { $1.nd = createNode(NULL, NULL, $1.name); $$.nd = createNode($1.nd, $4.nd, $3.name); }
+| ID { checkDeclaration($1.name); } UNARY {
+	$1.nd = createNode(NULL, NULL, $1.name);
+	$3.nd = createNode(NULL, NULL, $3.name);
+	$$.nd = createNode($1.nd, $3.nd, "ITERATOR");
 	if(!strcmp($3.name, "++")) {
 		sprintf(buff, "t%d = %s + 1\n%s = t%d\n", temp_var, $1.name, $1.name, temp_var++);
 	}
@@ -230,10 +231,10 @@ statement: datatype ID { add('V'); } init {
 	}
 }
 | UNARY ID {
-	check_declaration($2.name);
-	$1.nd = mknode(NULL, NULL, $1.name);
-	$2.nd = mknode(NULL, NULL, $2.name);
-	$$.nd = mknode($1.nd, $2.nd, "ITERATOR");
+	checkDeclaration($2.name);
+	$1.nd = createNode(NULL, NULL, $1.name);
+	$2.nd = createNode(NULL, NULL, $2.name);
+	$$.nd = createNode($1.nd, $2.nd, "ITERATOR");
 	if(!strcmp($1.name, "++")) {
 		sprintf(buff, "t%d = %s + 1\n%s = t%d\n", temp_var, $2.name, $2.name, temp_var++);
 	}
@@ -245,44 +246,44 @@ statement: datatype ID { add('V'); } init {
 ;
 
 init: '=' value { $$.nd = $2.nd; sprintf($$.type, $2.type); strcpy($$.name, $2.name); }
-| { sprintf($$.type, "null"); $$.nd = mknode(NULL, NULL, "NULL"); strcpy($$.name, "NULL"); }
+| { sprintf($$.type, "null"); $$.nd = createNode(NULL, NULL, "NULL"); strcpy($$.name, "NULL"); }
 ;
 
 expression: expression arithmetic expression {
 	if(!strcmp($1.type, $3.type)) {
 		sprintf($$.type, $1.type);
-		$$.nd = mknode($1.nd, $3.nd, $2.name);
+		$$.nd = createNode($1.nd, $3.nd, $2.name);
 	}
 	else {
 		if(!strcmp($1.type, "int") && !strcmp($3.type, "float")) {
-			struct node *temp = mknode(NULL, $1.nd, "inttofloat");
+			struct node *temp = createNode(NULL, $1.nd, "inttofloat");
 			sprintf($$.type, $3.type);
-			$$.nd = mknode(temp, $3.nd, $2.name);
+			$$.nd = createNode(temp, $3.nd, $2.name);
 		}
 		else if(!strcmp($1.type, "float") && !strcmp($3.type, "int")) {
-			struct node *temp = mknode(NULL, $3.nd, "inttofloat");
+			struct node *temp = createNode(NULL, $3.nd, "inttofloat");
 			sprintf($$.type, $1.type);
-			$$.nd = mknode($1.nd, temp, $2.name);
+			$$.nd = createNode($1.nd, temp, $2.name);
 		}
 		else if(!strcmp($1.type, "int") && !strcmp($3.type, "char")) {
-			struct node *temp = mknode(NULL, $3.nd, "chartoint");
+			struct node *temp = createNode(NULL, $3.nd, "chartoint");
 			sprintf($$.type, $1.type);
-			$$.nd = mknode($1.nd, temp, $2.name);
+			$$.nd = createNode($1.nd, temp, $2.name);
 		}
 		else if(!strcmp($1.type, "char") && !strcmp($3.type, "int")) {
-			struct node *temp = mknode(NULL, $1.nd, "chartoint");
+			struct node *temp = createNode(NULL, $1.nd, "chartoint");
 			sprintf($$.type, $3.type);
-			$$.nd = mknode(temp, $3.nd, $2.name);
+			$$.nd = createNode(temp, $3.nd, $2.name);
 		}
 		else if(!strcmp($1.type, "float") && !strcmp($3.type, "char")) {
-			struct node *temp = mknode(NULL, $3.nd, "chartofloat");
+			struct node *temp = createNode(NULL, $3.nd, "chartofloat");
 			sprintf($$.type, $1.type);
-			$$.nd = mknode($1.nd, temp, $2.name);
+			$$.nd = createNode($1.nd, temp, $2.name);
 		}
 		else {
-			struct node *temp = mknode(NULL, $1.nd, "chartofloat");
+			struct node *temp = createNode(NULL, $1.nd, "chartofloat");
 			sprintf($$.type, $3.type);
-			$$.nd = mknode(temp, $3.nd, $2.name);
+			$$.nd = createNode(temp, $3.nd, $2.name);
 		}
 	}
 	sprintf($$.name, "t%d", temp_var);
@@ -292,10 +293,8 @@ expression: expression arithmetic expression {
 | value { strcpy($$.name, $1.name); sprintf($$.type, $1.type); $$.nd = $1.nd; }
 ;
 
-arithmetic: ADD
-| SUBTRACT
-| MULTIPLY
-| DIVIDE
+return: RETURN { add('K'); } value ';' { checkReturnType($3.name); $1.nd = createNode(NULL, NULL, "return"); $$.nd = createNode($1.nd, $3.nd, "RETURN"); }
+| { $$.nd = NULL; }
 ;
 
 relop: LT
@@ -306,14 +305,16 @@ relop: LT
 | NE
 ;
 
-value: NUMBER { strcpy($$.name, $1.name); sprintf($$.type, "int"); add('C'); $$.nd = mknode(NULL, NULL, $1.name); }
-| FLOAT_NUM { strcpy($$.name, $1.name); sprintf($$.type, "float"); add('C'); $$.nd = mknode(NULL, NULL, $1.name); }
-| CHARACTER { strcpy($$.name, $1.name); sprintf($$.type, "char"); add('C'); $$.nd = mknode(NULL, NULL, $1.name); }
-| ID { strcpy($$.name, $1.name); char *id_type = get_type($1.name); sprintf($$.type, id_type); check_declaration($1.name); $$.nd = mknode(NULL, NULL, $1.name); }
+arithmetic: ADD
+| SUBTRACT
+| MULTIPLY
+| DIVIDE
 ;
 
-return: RETURN { add('K'); } value ';' { check_return_type($3.name); $1.nd = mknode(NULL, NULL, "return"); $$.nd = mknode($1.nd, $3.nd, "RETURN"); }
-| { $$.nd = NULL; }
+value: NUMBER { strcpy($$.name, $1.name); sprintf($$.type, "int"); add('C'); $$.nd = createNode(NULL, NULL, $1.name); }
+| FLOAT_NUM { strcpy($$.name, $1.name); sprintf($$.type, "float"); add('C'); $$.nd = createNode(NULL, NULL, $1.name); }
+| CHARACTER { strcpy($$.name, $1.name); sprintf($$.type, "char"); add('C'); $$.nd = createNode(NULL, NULL, $1.name); }
+| ID { strcpy($$.name, $1.name); char *id_type = getType($1.name); sprintf($$.type, id_type); checkDeclaration($1.name); $$.nd = createNode(NULL, NULL, $1.name); }
 ;
 
 %%
@@ -326,20 +327,20 @@ int main() {
 	printf("_______________________________________\n\n");
 	int i=0;
 	for(i=0; i<count; i++) {
-		printf("%s\t%s\t%s\t%d\t\n", symbol_table[i].id_name, symbol_table[i].data_type, symbol_table[i].type, symbol_table[i].line_no);
+		printf("%s\t%s\t%s\t%d\t\n", symbolTable[i].id_name, symbolTable[i].data_type, symbolTable[i].type, symbolTable[i].line_no);
 	}
 	for(i=0;i<count;i++) {
-		free(symbol_table[i].id_name);
-		free(symbol_table[i].type);
+		free(symbolTable[i].id_name);
+		free(symbolTable[i].type);
 	}
 	printf("\n\n");
 	printf("\t\t\t\t\t\t\t\t SYNTAX ANALYSIS \n\n");
-	print_tree(head);
+	printTree(head);
 	printf("\n\n\n\n");
 	printf("\t\t\t\t\t\t\t\t SEMANTIC ANALYSIS \n\n");
-	if(sem_errors>0) {
-		printf("Found %d errors\n", sem_errors);
-		for(int i=0; i<sem_errors; i++){
+	if(semanticErrorsCounter>0) {
+		printf("Found %d errors\n", semanticErrorsCounter);
+		for(int i=0; i<semanticErrorsCounter; i++){
 			printf("\t --- %s", errors[i]);
 		}
 	} else {
@@ -356,7 +357,7 @@ int main() {
 int search(char *type) {
 	int i;
 	for(i=count-1; i>=0; i--) {
-		if(strcmp(symbol_table[i].id_name, type)==0) {
+		if(strcmp(symbolTable[i].id_name, type)==0) {
 			return -1;
 			break;
 		}
@@ -364,27 +365,27 @@ int search(char *type) {
 	return 0;
 }
 
-void check_declaration(char *c) {
+void checkDeclaration(char *c) {
     q = search(c);
     if(!q) {
-        sprintf(errors[sem_errors], "Line %d: Variable \"%s\" not declared before usage!\n", countn+1, c);
-		sem_errors++;
+        sprintf(errors[semanticErrorsCounter], "Line %d: Variable \"%s\" not declared before usage!\n", countn+1, c);
+		semanticErrorsCounter++;
     }
 }
 
-void check_return_type(char *value) {
-	char *main_datatype = get_type("main");
-	char *return_datatype = get_type(value);
+void checkReturnType(char *value) {
+	char *main_datatype = getType("main");
+	char *return_datatype = getType(value);
 	if((!strcmp(main_datatype, "int") && !strcmp(return_datatype, "CONST")) || !strcmp(main_datatype, return_datatype)){
 		return ;
 	}
 	else {
-		sprintf(errors[sem_errors], "Line %d: Return type mismatch\n", countn+1);
-		sem_errors++;
+		sprintf(errors[semanticErrorsCounter], "Line %d: Return type mismatch\n", countn+1);
+		semanticErrorsCounter++;
 	}
 }
 
-int check_types(char *type1, char *type2){
+int checkTypes(char *type1, char *type2){
 	// declaration with no init
 	if(!strcmp(type2, "null"))
 		return -1;
@@ -413,11 +414,11 @@ int check_types(char *type1, char *type2){
 		return 6;
 }
 
-char *get_type(char *var){
+char *getType(char *var){
 	for(int i=0; i<count; i++) {
 		// Handle usage before declaration
-		if(!strcmp(symbol_table[i].id_name, var)) {
-			return symbol_table[i].data_type;
+		if(!strcmp(symbolTable[i].id_name, var)) {
+			return symbolTable[i].data_type;
 		}
 	}
 }
@@ -425,9 +426,9 @@ char *get_type(char *var){
 void add(char c) {
 	if(c == 'V'){
 		for(int i=0; i<10; i++){
-			if(!strcmp(reserved[i], strdup(yytext))){
-        		sprintf(errors[sem_errors], "Line %d: Variable name \"%s\" is a reserved keyword!\n", countn+1, yytext);
-				sem_errors++;
+			if(!strcmp(reservedKeywords[i], strdup(yytext))){
+        		sprintf(errors[semanticErrorsCounter], "Line %d: Variable name \"%s\" is a reservedKeywords keyword!\n", countn+1, yytext);
+				semanticErrorsCounter++;
 				return;
 			}
 		}
@@ -435,48 +436,48 @@ void add(char c) {
     q=search(yytext);
 	if(!q) {
 		if(c == 'H') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Header");
+			symbolTable[count].id_name=strdup(yytext);
+			symbolTable[count].data_type=strdup(type);
+			symbolTable[count].line_no=countn;
+			symbolTable[count].type=strdup("Header");
 			count++;
 		}
 		else if(c == 'K') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup("N/A");
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Keyword\t");
+			symbolTable[count].id_name=strdup(yytext);
+			symbolTable[count].data_type=strdup("N/A");
+			symbolTable[count].line_no=countn;
+			symbolTable[count].type=strdup("Keyword\t");
 			count++;
 		}
 		else if(c == 'V') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Variable");
+			symbolTable[count].id_name=strdup(yytext);
+			symbolTable[count].data_type=strdup(type);
+			symbolTable[count].line_no=countn;
+			symbolTable[count].type=strdup("Variable");
 			count++;
 		}
 		else if(c == 'C') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup("CONST");
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Constant");
+			symbolTable[count].id_name=strdup(yytext);
+			symbolTable[count].data_type=strdup("CONST");
+			symbolTable[count].line_no=countn;
+			symbolTable[count].type=strdup("Constant");
 			count++;
 		}
 		else if(c == 'F') {
-			symbol_table[count].id_name=strdup(yytext);
-			symbol_table[count].data_type=strdup(type);
-			symbol_table[count].line_no=countn;
-			symbol_table[count].type=strdup("Function");
+			symbolTable[count].id_name=strdup(yytext);
+			symbolTable[count].data_type=strdup(type);
+			symbolTable[count].line_no=countn;
+			symbolTable[count].type=strdup("Function");
 			count++;
 		}
     }
     else if(c == 'V' && q) {
-        sprintf(errors[sem_errors], "Line %d: Multiple declarations of \"%s\" not allowed!\n", countn+1, yytext);
-		sem_errors++;
+        sprintf(errors[semanticErrorsCounter], "Line %d: Multiple declarations of \"%s\" not allowed!\n", countn+1, yytext);
+		semanticErrorsCounter++;
     }
 }
 
-struct node* mknode(struct node *left, struct node *right, char *token) {
+struct node* createNode(struct node *left, struct node *right, char *token) {
 	struct node *newnode = (struct node *)malloc(sizeof(struct node));
 	char *newstr = (char *)malloc(strlen(token)+1);
 	strcpy(newstr, token);
@@ -486,23 +487,23 @@ struct node* mknode(struct node *left, struct node *right, char *token) {
 	return(newnode);
 }
 
-void print_tree(struct node* tree) {
+void printTree(struct node* tree) {
 	printf("\n\nInorder traversal of the Parse Tree is: \n\n");
-	print_inorder(tree);
+	printInorder(tree);
 }
 
-void print_inorder(struct node *tree) {
+void printInorder(struct node *tree) {
 	int i;
 	if (tree->left) {
-		print_inorder(tree->left);
+		printInorder(tree->left);
 	}
 	printf("%s, ", tree->token);
 	if (tree->right) {
-		print_inorder(tree->right);
+		printInorder(tree->right);
 	}
 }
 
-void insert_type() {
+void insertType() {
 	strcpy(type, yytext);
 }
 

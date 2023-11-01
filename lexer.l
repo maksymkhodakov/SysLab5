@@ -2,9 +2,10 @@
     #include "y.tab.h"
     int countn=0;
 %}
+
 %option yylineno
 
-alpha [a-zA-Z]
+alphabetic [a-zA-Z]
 digit [0-9]
 unary "++"|"--"
 
@@ -25,8 +26,12 @@ unary "++"|"--"
 "false"                     { strcpy(yylval.nd_obj.name,(yytext)); return FALSE; }
 [-]?{digit}+                { strcpy(yylval.nd_obj.name,(yytext)); return NUMBER; }
 [-]?{digit}+\.{digit}{1,6}  { strcpy(yylval.nd_obj.name,(yytext)); return FLOAT_NUM; }
-{alpha}({alpha}|{digit})*   { strcpy(yylval.nd_obj.name,(yytext)); return ID; }
+{alphabetic}({alphabetic}|{digit})*   { strcpy(yylval.nd_obj.name,(yytext)); return ID; }
 {unary}                     { strcpy(yylval.nd_obj.name,(yytext)); return UNARY; }
+"+"                         { strcpy(yylval.nd_obj.name,(yytext)); return ADD; }
+"-"                         { strcpy(yylval.nd_obj.name,(yytext)); return SUBTRACT; }
+"/"                         { strcpy(yylval.nd_obj.name,(yytext)); return DIVIDE; }
+"*"                         { strcpy(yylval.nd_obj.name,(yytext)); return MULTIPLY; }
 "<="                        { strcpy(yylval.nd_obj.name,(yytext)); return LE; }
 ">="                        { strcpy(yylval.nd_obj.name,(yytext)); return GE; }
 "=="                        { strcpy(yylval.nd_obj.name,(yytext)); return EQ; }
@@ -35,10 +40,6 @@ unary "++"|"--"
 "<"	                        { strcpy(yylval.nd_obj.name,(yytext)); return LT; }
 "&&"	                    { strcpy(yylval.nd_obj.name,(yytext)); return AND; }
 "||"	                    { strcpy(yylval.nd_obj.name,(yytext)); return OR; }
-"+"                         { strcpy(yylval.nd_obj.name,(yytext)); return ADD; }
-"-"                         { strcpy(yylval.nd_obj.name,(yytext)); return SUBTRACT; }
-"/"                         { strcpy(yylval.nd_obj.name,(yytext)); return DIVIDE; }
-"*"                         { strcpy(yylval.nd_obj.name,(yytext)); return MULTIPLY; }
 \/\/.*                      { ; }
 \/\*(.*\n)*.*\*\/           { ; }
 [ \t]*                      { ; }

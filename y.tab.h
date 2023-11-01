@@ -110,7 +110,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 56 "parser.y"
+#line 57 "parser.y"
 { 	struct var_name {
 			char name[100];
 			struct node* nd;
