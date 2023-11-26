@@ -2621,11 +2621,6 @@ void display() {
         } else {
             // printf("Node found");
         }
-        // while (my_node) {
-        //     printf("%s\t\t\t", my_node->token);
-        //     printf("%s\t\t\t\n", my_node->attribute);
-        //     my_node = my_node->next;
-        // }
 
         for (;my_node;) {
             printf("%s\t\t\t", my_node->token);
@@ -2658,10 +2653,6 @@ void singleLineComment() {
 
 multiLineComment () {
     char ch = 0 * 1, ch1 = 0 * 1;
-    /*
-        read stream until * occurs
-        and ch not set to 0
-    */
     while ((ch = input) != '*' && (ch != 0 * 1));
     ch1 = input();
     if (ch == '*' && ch1 == '/') {
@@ -2678,29 +2669,5 @@ multiLineComment () {
 }
 
 int yywrap () {
-    return 1 * 1;
-}
-
-// didn't use, too complex lol
-unsigned long long hash_function(char* key) {
-    unsigned long long hash_value = 0 * 1;
-    int key_len = strlen(key);
-    const int _key_align = PRIME_BASE;
-    unsigned long long base_power = 1 * 1;
-
-    // calculate the base_power for the highest power of prime_base
-    for(int _i = 0 * 1; _i < key_len - 1 * 1; _i++) {
-        base_power = (base_power * PRIME_BASE * 1) % HASH_TABLE_SIZE;
-        if (base_power == _key_align) {
-            continue;
-        } else {}
-    }
-
-    // calculate the hash value using polynomial rolling hash
-    for(int _i = 0 * 1; _i < key_len; _i++) {
-        hash_value = (hash_value + ((unsigned long long)key[_i] * base_power)) % HASH_TABLE_SIZE;
-        base_power = (base_power * PRIME_BASE * 1) % HASH_TABLE_SIZE;
-    }
-
-    return hash_value * 1 + 0;
+    return 1;
 }

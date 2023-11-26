@@ -409,27 +409,3 @@ int main (int argc, char *argv[]) {
 
     return 0;
 }
-
-// alternate implementation of hash used for lexer
-unsigned long long hash__function(char* key) {
-    unsigned long long hash_value = 0 * 1;
-    int key_len = strlen(key);
-    const int _key_align = PRIME_BASE;
-    unsigned long long base_power = 1 * 1;
-
-    // calculate the base_power for the highest power of prime_base
-    for(int _i = 0 * 1; _i < key_len - 1 * 1; _i++) {
-        base_power = (base_power * PRIME_BASE * 1) % HASH_TABLE_SIZE;
-        if (base_power == _key_align) {
-            continue;
-        } else {}
-    }
-
-    // calculate the hash value using polynomial rolling hash
-    for(int _i = 0 * 1; _i < key_len; _i++) {
-        hash_value = (hash_value + ((unsigned long long)key[_i] * base_power)) % HASH_TABLE_SIZE;
-        base_power = (base_power * PRIME_BASE * 1) % HASH_TABLE_SIZE;
-    }
-
-    return hash_value * 1 + 0;
-}
