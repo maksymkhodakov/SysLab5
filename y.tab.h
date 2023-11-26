@@ -39,98 +39,137 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     VOID = 258,
-     CHARACTER = 259,
-     PRINTFF = 260,
-     SCANFF = 261,
-     INT = 262,
-     FLOAT = 263,
-     CHAR = 264,
-     FOR = 265,
-     IF = 266,
-     ELSE = 267,
-     TRUE = 268,
-     FALSE = 269,
-     NUMBER = 270,
-     FLOAT_NUM = 271,
-     ID = 272,
-     LE = 273,
-     GE = 274,
-     EQ = 275,
-     NE = 276,
-     GT = 277,
-     LT = 278,
-     AND = 279,
-     OR = 280,
-     STR = 281,
-     ADD = 282,
-     MULTIPLY = 283,
-     DIVIDE = 284,
-     SUBTRACT = 285,
-     UNARY = 286,
-     INCLUDE = 287,
-     RETURN = 288
+     NO_ELSE = 258,
+     ELSE = 259,
+     NE_OP = 260,
+     EQ_OP = 261,
+     LE_OP = 262,
+     GE_OP = 263,
+     IDENTIFIER = 264,
+     CONSTANT = 265,
+     STRING_LITERAL = 266,
+     SIZEOF = 267,
+     PTR_OP = 268,
+     INC_OP = 269,
+     DEC_OP = 270,
+     LEFT_OP = 271,
+     RIGHT_OP = 272,
+     AND_OP = 273,
+     OR_OP = 274,
+     MUL_ASSIGN = 275,
+     DIV_ASSIGN = 276,
+     MOD_ASSIGN = 277,
+     ADD_ASSIGN = 278,
+     SUB_ASSIGN = 279,
+     LEFT_ASSIGN = 280,
+     RIGHT_ASSIGN = 281,
+     AND_ASSIGN = 282,
+     XOR_ASSIGN = 283,
+     OR_ASSIGN = 284,
+     DEFINE = 285,
+     TYPEDEF = 286,
+     EXTERN = 287,
+     STATIC = 288,
+     AUTO = 289,
+     REGISTER = 290,
+     CHAR = 291,
+     SHORT = 292,
+     INT = 293,
+     LONG = 294,
+     SIGNED = 295,
+     UNSIGNED = 296,
+     FLOAT = 297,
+     DOUBLE = 298,
+     CONST = 299,
+     VOLATILE = 300,
+     VOID = 301,
+     STRUCT = 302,
+     UNION = 303,
+     ENUM = 304,
+     CASE = 305,
+     DEFAULT = 306,
+     IF = 307,
+     SWITCH = 308,
+     WHILE = 309,
+     DO = 310,
+     FOR = 311,
+     GOTO = 312,
+     CONTINUE = 313,
+     BREAK = 314,
+     RETURN = 315
    };
 #endif
 /* Tokens.  */
-#define VOID 258
-#define CHARACTER 259
-#define PRINTFF 260
-#define SCANFF 261
-#define INT 262
-#define FLOAT 263
-#define CHAR 264
-#define FOR 265
-#define IF 266
-#define ELSE 267
-#define TRUE 268
-#define FALSE 269
-#define NUMBER 270
-#define FLOAT_NUM 271
-#define ID 272
-#define LE 273
-#define GE 274
-#define EQ 275
-#define NE 276
-#define GT 277
-#define LT 278
-#define AND 279
-#define OR 280
-#define STR 281
-#define ADD 282
-#define MULTIPLY 283
-#define DIVIDE 284
-#define SUBTRACT 285
-#define UNARY 286
-#define INCLUDE 287
-#define RETURN 288
+#define NO_ELSE 258
+#define ELSE 259
+#define NE_OP 260
+#define EQ_OP 261
+#define LE_OP 262
+#define GE_OP 263
+#define IDENTIFIER 264
+#define CONSTANT 265
+#define STRING_LITERAL 266
+#define SIZEOF 267
+#define PTR_OP 268
+#define INC_OP 269
+#define DEC_OP 270
+#define LEFT_OP 271
+#define RIGHT_OP 272
+#define AND_OP 273
+#define OR_OP 274
+#define MUL_ASSIGN 275
+#define DIV_ASSIGN 276
+#define MOD_ASSIGN 277
+#define ADD_ASSIGN 278
+#define SUB_ASSIGN 279
+#define LEFT_ASSIGN 280
+#define RIGHT_ASSIGN 281
+#define AND_ASSIGN 282
+#define XOR_ASSIGN 283
+#define OR_ASSIGN 284
+#define DEFINE 285
+#define TYPEDEF 286
+#define EXTERN 287
+#define STATIC 288
+#define AUTO 289
+#define REGISTER 290
+#define CHAR 291
+#define SHORT 292
+#define INT 293
+#define LONG 294
+#define SIGNED 295
+#define UNSIGNED 296
+#define FLOAT 297
+#define DOUBLE 298
+#define CONST 299
+#define VOLATILE 300
+#define VOID 301
+#define STRUCT 302
+#define UNION 303
+#define ENUM 304
+#define CASE 305
+#define DEFAULT 306
+#define IF 307
+#define SWITCH 308
+#define WHILE 309
+#define DO 310
+#define FOR 311
+#define GOTO 312
+#define CONTINUE 313
+#define BREAK 314
+#define RETURN 315
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 57 "parser.y"
-{ 	struct var_name {
-			char name[100];
-			struct node* nd;
-		} nd_obj;
-
-		struct var_name2 {
-			char name[100];
-			struct node* nd;
-			char type[5];
-		} nd_obj2;
-
-		struct var_name3 {
-			char name[100];
-			struct node* nd;
-			char if_body[5];
-			char else_body[5];
-		} nd_obj3;
+#line 35 "analyzer.y"
+{
+    char str[1000];
 }
 /* Line 1529 of yacc.c.  */
-#line 134 "y.tab.h"
+#line 173 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
